@@ -1,0 +1,27 @@
+﻿@model IEnumerable<EGISZtemplates.Data.Template>
+
+@{
+    ViewData["Title"] = "Управление шаблонами";
+}
+
+<h1>Шаблоны ЕГИСЗ</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Наименование файла</th>
+            <th>Дата последнего обновления</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.TemplateFilename</td>
+                <td>@item.LastUpdated</td>
+            </tr>
+        }
+    </tbody>
+</table>
