@@ -1,23 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using EGISZtemplates.Models;
 
 namespace EGISZtemplates.Data
 {
-    public class ApplicationDbContext : DbContext
-    {   // Контекст базы данных, ничего необычного
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
         public DbSet<Template> Templates { get; set; }
-    }
-
-    // Хэй-хэй, реализация класса шаблона для
-    // взаимодействия с ним внутри программы! >:3
-    public class Template
-    {
-        public int Id { get; set; }
-        public string TemplateFilename { get; set; }
-        public DateTime LastUpdated { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

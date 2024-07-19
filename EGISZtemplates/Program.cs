@@ -1,14 +1,29 @@
 using EGISZtemplates;
 using EGISZtemplates.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using EGISZtemplates.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllersWithViews();
 
 // Подрубаем нашу БД ёлки-палки
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllersWithViews();
+
+// Добавление пользовательского сервиса
+builder.Services.AddScoped<UserService>();
+
+// Настройка печенек (Cookie аутентификации)
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
 
 // Регаем папочку для файликов (шаблончиков)
 FileHelper.EnsureUploadsFolderExists();
@@ -39,4 +54,9 @@ app.MapControllerRoute(
     name: "templates",
     pattern: "{controller=Templates}/{action=Manage}/");
 
-app.Run();
+// ...и на страничку авторизации
+app.MapControllerRoute(
+    name: "templates",
+    pattern: "{controller=Account}/{action=Login}/");
+
+app.Run();  // ПОООГНАЛИ!

@@ -4,9 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using EGISZtemplates.Data;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using EGISZtemplates.Models;
 
 namespace EGISZtemplates.Controllers
 {
+    [Authorize]
     public class TemplatesController : Controller
     {
         private readonly ApplicationDbContext _context;
