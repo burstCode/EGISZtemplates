@@ -3,6 +3,13 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Добро пожаловать!</h1>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h2 class="display-4">Добро пожаловать, @User.Identity.Name!</h2>
+    }
+    else
+    {
+        <h2 class="display-4">Добро пожаловать!</h2>
+    }
     <p>Нажмите на кнопку "Управление шаблонами", чтобы увидеть текущие шаблоны, либо загрузить новые.</p>
 </div>
