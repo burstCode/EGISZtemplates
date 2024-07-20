@@ -42,10 +42,12 @@ namespace EGISZtemplates.Controllers
                     var authProperties = new AuthenticationProperties { IsPersistent = model.RememberMe };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                    TempData["SuccessMessage"] = "Вы успешно вошли в систему!";
                     return RedirectToAction("Index", "Home");
                 }
 
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                TempData["ErrorMessage"] = "Неверный адрес эл. почты или пароль!";
             }
 
             return View(model);
@@ -55,6 +57,8 @@ namespace EGISZtemplates.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            TempData["SuccessMessage"] = "Вы вышли из системы!";
             return RedirectToAction("Index", "Home");
         }
     }
