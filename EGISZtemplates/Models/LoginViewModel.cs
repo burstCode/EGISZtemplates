@@ -4,15 +4,15 @@ namespace EGISZtemplates.Models
 {
     public class LoginViewModel
     {
-        [Required(ErrorMessage = "Вы пытаетесь войти в аккаунт без эмейла? Ха! НЕ ВЫЙДЕТ!")]
-        [EmailAddress(ErrorMessage = "Это не похоже на действительный адрес электронной почты.")]
+        [Required(ErrorMessage = "Данное поле не может быть пустым")]
+        [EmailAddress(ErrorMessage = "Введите корректный адрес электронной почты")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "ТАК ПРОСТО ВАМ НЕ ПОПАСТЬ В СИСТЕМУ, СПЕРВА - НУЖЕН ПАРОЛЬ!")]
+        [Required(ErrorMessage = "Данное поле не может быть пустым")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Display(Name = "Запомнить?")]
+        [Display(Name = "Запомнить вход?")]
         public bool RememberMe { get; set; }
     }
 }
