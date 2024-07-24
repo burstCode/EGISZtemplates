@@ -40,7 +40,14 @@ namespace EGISZtemplates.Controllers
 
             if (file != null && file.Length > 0)
             {
-                // Логика сохранения файла
+                // Удаляем устаревший шаблон
+                var oldFilePath = Path.Combine("Uploads", template.TemplateFilename);
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+
+                // И сохраняем новый
                 var filePath = Path.Combine("Uploads", file.FileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
