@@ -8,7 +8,7 @@ namespace EGISZtemplates
         // Если папочки нет, то создаёт её. Вызывается в начале Program.cs
         public static void EnsureUploadsFolderExists()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "TemplateFiles");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

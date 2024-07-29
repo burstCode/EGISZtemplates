@@ -13,6 +13,7 @@
             <th>id</th>
             <th>Наименование шаблона</th>
             <th>Дата последнего обновления</th>
+            <th>Версия</th>
             <th>Выбрать</th>
         </tr>
     </thead>
@@ -22,7 +23,8 @@
             <tr>
                 <td>@item.Id</td>
                 <td>@item.TemplateFilename</td>
-                <td>@item.LastUpdated</td>
+                <td>@item.LastUpdated.ToString("dd.MM.yyyy")</td>
+				<td>@item.Version</td>
                 <td>
                     <input type="radio" name="selectedTemplate" value="@item.Id" />
                 </td>
@@ -47,10 +49,6 @@
 <h2>Добавить новый шаблон</h2>
 
 <form asp-action="AddTemplate" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="id">Код шаблона</label>
-        <input type="number" name="id" class="form-control" required />
-    </div>
     <div class="form-group">
         <label for="file">Загрузить файл</label>
         <input type="file" name="file" class="form-control" required />
@@ -84,8 +82,12 @@
 
         $(document).ready(function() {
             var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
             if (successMessage) {
                 toastr.success(successMessage);
+            }
+            if (errorMessage) {
+                toastr.error(errorMessage);
             }
         });
     </script>
