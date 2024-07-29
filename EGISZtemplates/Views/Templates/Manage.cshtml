@@ -4,9 +4,36 @@
     ViewData["Title"] = "Управление шаблонами";
 }
 
-<h1>Список шаблонов</h1>
+@* Форма для загрузки нового шаблона *@
+<h2>Добавить новый шаблон</h2>
+
+<form asp-action="AddTemplate" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Загрузить новый шаблон</label>
+        <input type="file" name="file" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success">Добавить шаблон</button>
+</form>
+
+<hr />
+
+@* Форма для обновления шаблона *@
+<h2>Обновить существующий шаблон</h2>
+
+<form id="updateForm" asp-action="UpdateTemplate" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Загрузить более актуальный шаблон</label>
+        <input type="file" name="file" class="form-control" required />
+    </div>
+    <input type="hidden" name="id" id="selectedTemplateId" />
+    <button type="submit" class="btn btn-primary">Обновить шаблон</button>
+</form>
+
+<hr />
 
 @* Таблица с данными из БД *@
+<h1>Список шаблонов</h1>
+
 <table class="table">
     <thead>
         <tr>
@@ -32,29 +59,6 @@
         }
     </tbody>
 </table>
-
-@* Форма для обновления шаблона *@
-<form id="updateForm" asp-action="UpdateTemplate" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="file">Загрузить новый шаблон</label>
-        <input type="file" name="file" class="form-control" required />
-    </div>
-    <input type="hidden" name="id" id="selectedTemplateId" />
-    <button type="submit" class="btn btn-primary">Обновить шаблон</button>
-</form>
-
-<hr />
-
-@* Форма для загрузки нового шаблона *@
-<h2>Добавить новый шаблон</h2>
-
-<form asp-action="AddTemplate" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="file">Загрузить файл</label>
-        <input type="file" name="file" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-success">Добавить шаблон</button>
-</form>
 
 @* 
     Красивые уведомления об ошибочных и успешных действиях 
