@@ -20,10 +20,12 @@ namespace EGISZtemplates.Services
             return user;
         }
 
+        /*
         public async Task RegisterAsync(User user)
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
+        */
     }
 }
