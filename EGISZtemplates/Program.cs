@@ -25,9 +25,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
-// Регаем папочку для файликов (шаблончиков)
-FileHelper.EnsureUploadsFolderExists();
-
 var app = builder.Build();
 
 // Бла-бла-бла, отловщик-отладчик-фиксатор ошибок на стадии разработки
