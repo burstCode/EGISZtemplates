@@ -20,73 +20,21 @@ namespace EGISZtemplates.Controllers
             _context = context;
         }
 
-        // Показывает страничку и список с шаблонами
+        // Отображает страницу для управления шаблонами
         public async Task<IActionResult> Manage()
         {
             var templates = await _context.Templates.ToListAsync();
             return View(templates);
         }
 
-        // Тут происходит обновление выбранного шаблона
-        // По кнопочке "Обновить шаблон"
+        /*
+         * Загрузка нового шаблона.
+         * Если в базе данных находится шаблон с таким же id, но
+         * с более старой датой обновления, то он ЗАМЕНЯЕТСЯ новым.
+         * В случае, если шаблона с таким id нет, то просто ДОБАВЛЯЕТСЯ.
+         */
         [HttpPost]
-        public async Task<IActionResult> UpdateTemplate(int id, IFormFile file)
-        {
-            // Смотрим какой шаблон в таблице выбрал пользователь
-            var template = await _context.Templates.FindAsync(id);
-            
-            if (file == null)
-            {
-                TempData["ErrorMessage"] = "Файл не выбран!";
-                return RedirectToAction(nameof(Manage));
-            }
-            
-            if (file.Length == 0)
-            {
-                TempData["ErrorMessage"] = "Загружен пустой файл!";
-                return RedirectToAction(nameof(Manage));
-            }
-
-            try
-            {
-                var updatedTemplate = FilenameParser.ParseTemplateFilename(file.FileName);
-
-                // Удаляем устаревший шаблон из файловой системы
-                var oldFilePath = Path.Combine("TemplateFiles", template.TemplateFilename);
-                if (System.IO.File.Exists(oldFilePath))
-                {
-                    System.IO.File.Delete(oldFilePath);
-                }
-
-                // Удаляем его из базы данных
-                _context.Templates.Remove(template);
-                await _context.SaveChangesAsync();
-
-                // Сохраняем новый шаблон в файловую систему
-                var newfilePath = Path.Combine("TemplateFiles", file.FileName);
-                using (var stream = new FileStream(newfilePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // И сохраняем его в базу данных
-                _context.Templates.Add(updatedTemplate);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Шаблон успешно обновлен!";
-            }
-            catch (ArgumentException ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
-
-            return RedirectToAction(nameof(Manage));
-        }
-
-        // Тут работает кнопочка "Добавить шаблон"
-        // Добавляется новый шаблончик короче
-        [HttpPost]
-        public async Task<IActionResult> AddTemplate(IFormFile file)
+        public async Task<IActionResult> LoadTemplate(IFormFile file)
         {
             if (file == null)
             {
@@ -102,32 +50,54 @@ namespace EGISZtemplates.Controllers
 
             try
             {
-                var template = FilenameParser.ParseTemplateFilename(file.FileName);
+                // Парсим название загруженного шаблона
+                var newTemplate = FilenameParser.ParseTemplateFilename(file.FileName);
 
-                // Проверяем шаблон на дубликат
-                if (_context.Templates.Any(t => t.Id == template.Id))
+                // Читаем шаблон 
+                using (var memoryStream = new MemoryStream())
                 {
-                    throw new ArgumentException("Шаблон с таким id уже существует!");
+                    await file.CopyToAsync(memoryStream);
+                    newTemplate.Content = memoryStream.ToArray();
                 }
 
-                // Сохраняем новый шаблон в файловую систему
-                var filePath = Path.Combine("TemplateFiles", file.FileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Пытаемся найти шаблон с таким же id, как у загруженного
+                var oldTemplate = await _context.Templates.FindAsync(newTemplate.Id);
+
+                // Если такого шаблона еще нет, то добавляем в качестве нового
+                if (oldTemplate == null)
                 {
-                    await file.CopyToAsync(stream);
+                    _context.Templates.Add(newTemplate);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Новый шаблон успешно добавлен!";
                 }
+                // Но если такой шаблон уже существует, то проверяем дату последнего обновления
+                else
+                {
+                    if (oldTemplate.LastUpdated < newTemplate.LastUpdated)
+                    {
+                        oldTemplate.TemplateFilename = file.FileName;
+                        oldTemplate.LastUpdated = newTemplate.LastUpdated;
+                        oldTemplate.Version = newTemplate.Version;
+                        oldTemplate.Content = newTemplate.Content;
 
-                // Добавляем новый шаблон в базу данных
-                _context.Templates.Add(template);
-                await _context.SaveChangesAsync();
+                        _context.Templates.Update(oldTemplate);
+                        await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Шаблон успешно добавлен!";
+                        TempData["SuccessMessage"] = "Существующий шаблон успешно обновлен!";
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "Загруженный шаблон уже имеет актуальную версию!";
+                    }
+                }
             }
             catch (ArgumentException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
             }
 
+            // Обновляем страницу
             return RedirectToAction(nameof(Manage));
         }
     }
